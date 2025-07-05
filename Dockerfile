@@ -1,8 +1,8 @@
-FROM golang as build
-RUN go get github.com/mindprince/nvidia_gpu_prometheus_exporter
+FROM golang:latest AS build
+RUN go install github.com/plazonic/nvidia_gpu_prometheus_exporter@latest
 
-FROM ubuntu:18.04
-COPY --from=build /go/bin/nvidia_gpu_prometheus_exporter /
-CMD /nvidia_gpu_prometheus_exporter
-ENV NVIDIA_VISIBLE_DEVICES=all
-EXPOSE 9445
+FROM ubuntu:22.04
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && rm -rf /var/lib/apt/lists/*
+COPY --from=build /go/bin/nvidia_gpu_prometheus_exporter /usr/local/bin/
+CMD ["nvidia_gpu_prometheus_exporter"]
+
